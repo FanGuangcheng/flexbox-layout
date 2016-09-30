@@ -16,6 +16,8 @@
 
 package com.google.android.flexbox;
 
+import android.view.View;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,8 @@ import java.util.List;
  * other classes using the {@link FlexboxLayout}.
  */
 public class FlexLine {
+
+    private static final int NO_POSITION = -1;
 
     FlexLine() {
     }
@@ -64,7 +68,7 @@ public class FlexLine {
 
     /**
      * The largest value of the individual child's baseline (obtained by View#getBaseline()
-     * if the {@link FlexboxLayout#mAlignItems} value is not {@link FlexboxLayout#ALIGN_ITEMS_BASELINE}
+     * if the {@link FlexboxLayout#mAlignItems} value is not {@link AlignItems#BASELINE}
      * or the flex direction is vertical, this value is not used.
      * If the alignment direction is from the bottom to top,
      * (e.g. flexWrap == WRAP_REVERSE and flexDirection == ROW)
@@ -79,6 +83,16 @@ public class FlexLine {
      * not the relative indices in this flex line.
      */
     List<Integer> mIndicesAlignSelfStretch = new ArrayList<>();
+
+    /**
+     * Store the index of the first view in the flex line.
+     */
+    int mFirstIndex = NO_POSITION;
+
+    /**
+     * Store the index of the last view in the flex line.
+     */
+    int mLastIndex = NO_POSITION;
 
     /**
      * @return the distance in pixels from the top edge of this view's parent
@@ -145,5 +159,18 @@ public class FlexLine {
      */
     public float getTotalFlexShrink() {
         return mTotalFlexShrink;
+    }
+
+    /**
+     * Updates the position of the flex line from the contained view.
+     *
+     * @param view the view contained in this flex line
+     */
+    void updatePositionFromView(View view) {
+        FlexItem flexItem = (FlexItem) view.getLayoutParams();
+        mLeft = Math.min(mLeft, view.getLeft() - flexItem.getMarginLeft());
+        mTop = Math.min(mTop, view.getTop() - flexItem.getMarginTop());
+        mRight = Math.max(mRight, view.getRight() + flexItem.getMarginRight());
+        mBottom = Math.max(mBottom, view.getBottom() + flexItem.getMarginBottom());
     }
 }
